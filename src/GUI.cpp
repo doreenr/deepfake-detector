@@ -163,7 +163,7 @@ void GUI::drawSignalRow(const SignalScore& s, float x, float y, float w) {
 
     // Score — vertically centred in right column
     ofSetColor(s.active ? COL_TITLE : COL_DIM);
-    string val = s.active ? ofToString(s.score, 1) : "0.5";
+    string val = ofToString(s.score, 2);
     float valW = tw(fontReg, val);
     float rightColCX = divX + (x + w - divX) * 0.5f;
     txt(fontReg, val,
@@ -237,7 +237,7 @@ GUIButton GUI::hitTest(float x, float y) const {
 // ─────────────────────────────────────────────────────────────────────────────
 AuthenticityLevel GUI::scoreToLevel(float score) const {
     if (score >= 0.7f) return AuthenticityLevel::AUTHENTIC;
-    if (score >= 0.4f) return AuthenticityLevel::UNCERTAIN;
+    if (score >= 0.6f) return AuthenticityLevel::UNCERTAIN;
     return AuthenticityLevel::FAKE;
 }
 
