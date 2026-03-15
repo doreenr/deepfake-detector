@@ -61,6 +61,17 @@ void ofApp::update() {
         for (auto& face : tracker.getFaces()) {
             blinkAnalyzers[face.id].update(face.landmarks);
         }
+
+        // Wire scores into the sidebar – use face 0 if present
+        if (!tracker.getFaces().empty()) {
+            int id = tracker.getFaces()[0].id;
+            signalScores[0].score  = blinkAnalyzers[id].getScore();
+            signalScores[0].label  = "Blink analysis";
+            signalScores[0].active = true;
+        } else {
+            signalScores[0].label  = "Blink analysis";
+            signalScores[0].active = false;
+        }
     }
 
     // TODO: replace with real detector outputs, e.g.:
@@ -146,7 +157,8 @@ void ofApp::draw() {
     hudText(hudFont, fps, ofGetWidth() - fpsW - 24, ofGetHeight() - 20);
 
     // ── 4. Sidebar (always on top) ────────────────────────────────────
-    float composite = 0.5f; // TODO: replace with real weighted score
+    // Composite: blink score if active, otherwise 0.5 placeholder
+    float composite = signalScores[0].active ? signalScores[0].score : 0.5f;
     gui.draw(signalScores, composite);
 }
 
