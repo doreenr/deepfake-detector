@@ -4,6 +4,14 @@
 namespace mp = ofx::MediaPipe;
 
 void FaceTracker::setup() {
+    // Explicitly release the old tracker first so its py_landmarker fully
+    // closes before we construct the new one. Without this, the old shared_ptr
+    // is overwritten mid-setup and the two teardown/init sequences overlap,
+    // which leaves the landmarker in a broken state.
+    if (mpTracker) {
+        mpTracker.reset();
+    }
+
     mpTracker = make_shared<mp::FaceTracker>();
     mp::FaceTracker::FaceSettings settings;
     settings.maxNum = 2;
@@ -48,14 +56,14 @@ void FaceTracker::update(ofPixels& pixels) {
         Face f;
         f.id = mpFace->ID;
 
-        // convert 3d keypoints to 2d landmarks scaled to image size
+        // ofxMediaPipe already returns keypoints in pixel coordinates.
         for (auto& kp : mpFace->keypoints) {
             f.landmarks.push_back(glm::vec2(kp.pos.x, kp.pos.y));
         }
 
         f.bbox = computeBBox(f.landmarks, imgW, imgH);
 
-        // crop the face region from the frame
+        // Crop the face region from the frame
         cv::Mat frame = ofxCv::toCv(pixels);
         cv::Rect safe = f.bbox & cv::Rect(0, 0, imgW, imgH);
         if (safe.area() > 100) {

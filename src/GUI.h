@@ -15,11 +15,16 @@ struct SignalScore {
     bool   active;  // false = placeholder / not yet implemented
 };
 
+enum class GUIButton { NONE, UPLOAD, WEBCAM };
+
 class GUI {
 public:
     void setup();
     void draw(const vector<SignalScore>& scores, float composite);
     float getSidebarWidth() const { return sidebarW; }
+
+    // Returns which sidebar button was clicked, or NONE.
+    GUIButton hitTest(float x, float y) const;
 
 private:
     // ── sub-draw helpers ─────────────────────────────────────────────
@@ -56,6 +61,10 @@ private:
     float btnGap     = 20.0f;
     float rowH       = 108.0f;
     float sectionGap = 40.0f;
+
+    // Rects of the two source buttons — populated during draw(), used by hitTest().
+    ofRectangle uploadBtnRect;
+    ofRectangle webcamBtnRect;
 
     // ── misc helpers ─────────────────────────────────────────────────
     AuthenticityLevel scoreToLevel(float score) const;

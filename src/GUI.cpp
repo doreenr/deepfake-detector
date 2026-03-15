@@ -122,9 +122,12 @@ void GUI::drawSourceButtons(float& cursorY) {
             y + btnH * 0.5f + 10);
     };
 
-    drawBtn("Upload video",    cursorY);
+    drawBtn("Upload video", cursorY);
+    uploadBtnRect.set(padX, cursorY, btnW, btnH);
     cursorY += btnH + btnGap;
+
     drawBtn("Switch to webcam", cursorY);
+    webcamBtnRect.set(padX, cursorY, btnW, btnH);
     cursorY += btnH + sectionGap;
 }
 
@@ -154,13 +157,13 @@ void GUI::drawSignalRow(const SignalScore& s, float x, float y, float w) {
 
     // Label — vertically centred in left column
     ofSetColor(s.active ? COL_LABEL : COL_DIM);
-    txt(fontReg, s.label + " placeholder",
+    txt(fontReg, s.label,
         x + 24,
         y + rowH * 0.5f + 10);
 
     // Score — vertically centred in right column
     ofSetColor(s.active ? COL_TITLE : COL_DIM);
-    string val = s.active ? ofToString(s.score, 1) : "0.5";
+    string val = ofToString(s.score, 2);
     float valW = tw(fontReg, val);
     float rightColCX = divX + (x + w - divX) * 0.5f;
     txt(fontReg, val,
@@ -225,9 +228,16 @@ void GUI::drawHorizontalTrafficLight(float cx, float cy, AuthenticityLevel level
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+GUIButton GUI::hitTest(float x, float y) const {
+    if (uploadBtnRect.inside(x, y)) return GUIButton::UPLOAD;
+    if (webcamBtnRect.inside(x, y)) return GUIButton::WEBCAM;
+    return GUIButton::NONE;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 AuthenticityLevel GUI::scoreToLevel(float score) const {
-    if (score >= 0.65f) return AuthenticityLevel::AUTHENTIC;
-    if (score >= 0.35f) return AuthenticityLevel::UNCERTAIN;
+    if (score >= 0.7f) return AuthenticityLevel::AUTHENTIC;
+    if (score >= 0.6f) return AuthenticityLevel::UNCERTAIN;
     return AuthenticityLevel::FAKE;
 }
 
