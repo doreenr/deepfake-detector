@@ -30,6 +30,7 @@
 		"8610B7DD-9F03-4C94-BB99-5930573B2C72" /* ofxMediaPipeUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "26B3B0DE-71A9-4CB4-AE72-67D56BAE8114" /* ofxMediaPipeUtils.cpp */; };
 		"95CD5F93-4816-45BF-A418-3408669F4D7F" /* ofxMediaPipeTracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "3965757E-5148-4615-92DC-22E0CD159118" /* ofxMediaPipeTracker.cpp */; };
 		"9623AA78-1928-466D-A4E1-9E894B2B3E66" /* ofxMediaPipeOscReceiver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "4A584373-58C3-4469-90F6-DF7C1D806034" /* ofxMediaPipeOscReceiver.cpp */; };
+		9A6062D82F67436C00FF248D /* BlinkAnalyzer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A6062D72F67436C00FF248D /* BlinkAnalyzer.cpp */; };
 		9A9AE7AA2F66ED2A007DC038 /* libpython3.11.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = "D8347559-E77C-4BF7-8D57-4847AD1FE9A1" /* libpython3.11.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		9A9AE7AD2F66EEF0007DC038 /* GUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A9AE7AC2F66EEEC007DC038 /* GUI.cpp */; };
 		"9C81C3DE-478C-4D24-9112-E97623FD953E" /* ETF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "386672BF-6EA2-4FFB-B129-CC5C76F2D42E" /* ETF.cpp */; };
@@ -823,6 +824,8 @@
 		"9A1F4848-6626-4C6F-9B49-7BBCE506F057" /* setobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = setobject.h; sourceTree = "<group>"; };
 		"9A4B7A25-D296-43EA-98B8-999DFFE07B71" /* warp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = warp.hpp; sourceTree = "<group>"; };
 		"9A58C781-C505-466C-9856-A61A151C93E4" /* color_detail.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = color_detail.hpp; sourceTree = "<group>"; };
+		9A6062D62F67436C00FF248D /* BlinkAnalyzer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BlinkAnalyzer.h; sourceTree = "<group>"; };
+		9A6062D72F67436C00FF248D /* BlinkAnalyzer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BlinkAnalyzer.cpp; sourceTree = "<group>"; };
 		9A9AE7AB2F66EEC7007DC038 /* GUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GUI.h; sourceTree = "<group>"; };
 		9A9AE7AC2F66EEEC007DC038 /* GUI.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GUI.cpp; sourceTree = "<group>"; };
 		"9B03ED29-49C1-413B-A272-54FC279D921A" /* imgcodecs_c.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = imgcodecs_c.h; sourceTree = "<group>"; };
@@ -3733,6 +3736,8 @@
 		E4B69E1C0A3A1BDC003C02F2 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				9A6062D62F67436C00FF248D /* BlinkAnalyzer.h */,
+				9A6062D72F67436C00FF248D /* BlinkAnalyzer.cpp */,
 				9A9AE7AC2F66EEEC007DC038 /* GUI.cpp */,
 				9A9AE7AB2F66EEC7007DC038 /* GUI.h */,
 				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
@@ -4159,6 +4164,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9A6062D82F67436C00FF248D /* BlinkAnalyzer.cpp in Sources */,
 				E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */,
 				E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */,
 				"4A95C9A3-D69B-4450-A0E1-E9D9318188DE" /* FaceTracker.cpp in Sources */,
