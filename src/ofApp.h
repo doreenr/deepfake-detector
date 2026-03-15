@@ -3,6 +3,8 @@
 #include "ofMain.h"
 #include "FaceTracker.h"
 #include "GUI.h"
+#include "BlinkAnalyzer.h"
+#include <map>
 
 class ofApp : public ofBaseApp {
 public:
@@ -24,4 +26,10 @@ private:
 
     // Individual signal scores fed into the GUI.
     vector<SignalScore> signalScores;
+    ofPixels videoPixels;
+    ofTexture videoTexture;
+    FaceTracker tracker;
+
+    // one blink analyzer per face ID
+    map<int, BlinkAnalyzer> blinkAnalyzers;
 };

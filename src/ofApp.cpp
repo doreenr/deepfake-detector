@@ -31,6 +31,12 @@ void ofApp::update() {
         videoPixels = cam.getPixels();
         tracker.update(videoPixels);
         videoTexture.loadData(videoPixels);
+
+        // run blink analysis on each detected face
+        auto& faces = tracker.getFaces();
+        for (auto& face : faces) {
+            blinkAnalyzers[face.id].update(face.landmarks);
+        }
     }
 
     // TODO: replace with real detector outputs, e.g.:
