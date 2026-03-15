@@ -122,9 +122,12 @@ void GUI::drawSourceButtons(float& cursorY) {
             y + btnH * 0.5f + 10);
     };
 
-    drawBtn("Upload video",    cursorY);
+    drawBtn("Upload video", cursorY);
+    uploadBtnRect.set(padX, cursorY, btnW, btnH);
     cursorY += btnH + btnGap;
+
     drawBtn("Switch to webcam", cursorY);
+    webcamBtnRect.set(padX, cursorY, btnW, btnH);
     cursorY += btnH + sectionGap;
 }
 
@@ -222,6 +225,13 @@ void GUI::drawHorizontalTrafficLight(float cx, float cy, AuthenticityLevel level
 
     ofSetColor(greenOn ? COL_GREEN  : COL_GREEN_DIM);
     ofDrawCircle(cx + spacing, cy, bulbR);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+GUIButton GUI::hitTest(float x, float y) const {
+    if (uploadBtnRect.inside(x, y)) return GUIButton::UPLOAD;
+    if (webcamBtnRect.inside(x, y)) return GUIButton::WEBCAM;
+    return GUIButton::NONE;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

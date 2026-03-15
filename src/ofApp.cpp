@@ -1,6 +1,7 @@
 #include "ofApp.h"
 #include "ofAppGLFWWindow.h"
 
+// ─────────────────────────────────────────────────────────────────────────────
 void ofApp::setup() {
     ofSetFrameRate(30);
     ofSetWindowTitle("Deepfake Detector");
@@ -25,16 +26,39 @@ void ofApp::setup() {
     };
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
 void ofApp::update() {
-    cam.update();
-    if (cam.isInitialized() && cam.isFrameNew()) {
-        videoPixels = cam.getPixels();
-        tracker.update(videoPixels);
-        videoTexture.loadData(videoPixels);
+    bool hasNewPixels = false;
 
-        // run blink analysis on each detected face
-        auto& faces = tracker.getFaces();
-        for (auto& face : faces) {
+    if (currentMode == SourceMode::CAMERA) {
+        cam.update();
+        if (cam.isInitialized() && cam.isFrameNew()) {
+            videoPixels  = cam.getPixels();
+            hasNewPixels = true;
+        }
+    }
+    else if (currentMode == SourceMode::VIDEO) {
+        videoPlayer.update();
+        if (videoPlayer.isInitialized() && videoPlayer.isFrameNew()) {
+            videoPixels  = videoPlayer.getPixels();
+            videoPixels.setImageType(OF_IMAGE_COLOR);
+            hasNewPixels = true;
+        }
+    }
+    else if (currentMode == SourceMode::IMAGE) {
+        // Static image – push pixels every frame so the tracker keeps running.
+        if (loadedImage.isAllocated()) {
+            videoPixels  = loadedImage.getPixels();
+            hasNewPixels = true;
+        }
+    }
+
+    if (hasNewPixels) {
+        videoTexture.loadData(videoPixels);
+        tracker.update(videoPixels);
+
+        // Run blink analysis on each detected face
+        for (auto& face : tracker.getFaces()) {
             blinkAnalyzers[face.id].update(face.landmarks);
         }
     }
@@ -44,6 +68,7 @@ void ofApp::update() {
     // signalScores[0].active = true;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
 // Draws text at logical position (x,y). Font is loaded at 2× for Retina
 // sharpness; we scale down by 0.5 so it renders at the correct logical size.
 static void hudText(const ofTrueTypeFont& f, const string& s, float x, float y) {
@@ -58,6 +83,7 @@ static void hudText(const ofTrueTypeFont& f, const string& s, float x, float y) 
     }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
 void ofApp::draw() {
     float sbW   = gui.getSidebarWidth();
     float areaX = sbW;
@@ -65,7 +91,10 @@ void ofApp::draw() {
     float areaH = ofGetHeight();
 
     // ── 1. Letterboxed video feed ─────────────────────────────────────
-    const float srcW = 1280.0f, srcH = 720.0f;
+    // Use the actual frame dimensions so any source aspect ratio letterboxes
+    // correctly (not just 1280x720 webcam feeds).
+    float srcW = (videoTexture.getWidth()  > 0) ? videoTexture.getWidth()  : 1280.0f;
+    float srcH = (videoTexture.getHeight() > 0) ? videoTexture.getHeight() : 720.0f;
     float scale = std::min(areaW / srcW, areaH / srcH);
     float drawW = srcW * scale;
     float drawH = srcH * scale;
@@ -104,7 +133,7 @@ void ofApp::draw() {
 
     // ── 3. Video-area HUD ─────────────────────────────────────────────
     ofSetColor(255);
-    hudText(hudFont, "Webcam", drawX + 24, drawY + 42);
+    hudText(hudFont, sourceModeLabel(), drawX + 24, drawY + 42);
 
     ofSetColor(255);
     hudText(hudFont, "Faces detected: " + ofToString(tracker.count()),
@@ -112,7 +141,7 @@ void ofApp::draw() {
 
     // FPS – bottom-right corner
     ofSetColor(120);
-    string fps = "FPS: " + ofToString((int)ofGetFrameRate());
+    string fps  = "FPS: " + ofToString((int)ofGetFrameRate());
     float  fpsW = hudFont.isLoaded() ? hudFont.stringWidth(fps) * 0.5f : fps.size() * 8.0f;
     hudText(hudFont, fps, ofGetWidth() - fpsW - 24, ofGetHeight() - 20);
 
@@ -121,6 +150,85 @@ void ofApp::draw() {
     gui.draw(signalScores, composite);
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
 void ofApp::exit() {
     tracker.exit();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+void ofApp::keyPressed(int key) {
+
+    // ── C: switch back to webcam ──────────────────────────────────────
+    if (key == 'c' || key == 'C') {
+        if (videoPlayer.isLoaded()) videoPlayer.stop();
+        currentMode = SourceMode::CAMERA;
+        resetTracker();
+        return;
+    }
+
+    // ── U: upload a video or image file ──────────────────────────────
+    if (key == 'u' || key == 'U') {
+        ofFileDialogResult result = ofSystemLoadDialog("Select video or image");
+        if (!result.bSuccess) return;
+
+        string path = result.getPath();
+        string ext  = ofToLower(ofFilePath::getFileExt(path));
+
+        if (ext == "mp4" || ext == "mov" || ext == "avi") {
+            if (videoPlayer.isLoaded()) videoPlayer.stop();
+            videoPlayer.load(path);
+            videoPlayer.setLoopState(OF_LOOP_NORMAL);
+            videoPlayer.play();
+            currentMode = SourceMode::VIDEO;
+            resetTracker();
+        }
+        else if (ext == "jpg" || ext == "jpeg" || ext == "png") {
+            loadedImage.load(path);
+            loadedImage.setImageType(OF_IMAGE_COLOR);
+            currentMode = SourceMode::IMAGE;
+            resetTracker();
+        }
+        else {
+            ofLogWarning("ofApp") << "Unsupported file type: " << ext;
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+void ofApp::mousePressed(int x, int y, int button) {
+    if (button != OF_MOUSE_BUTTON_LEFT) return;
+
+    switch (gui.hitTest(x, y)) {
+        case GUIButton::UPLOAD:
+            // Reuse the same logic as pressing U
+            ofApp::keyPressed('u');
+            break;
+        case GUIButton::WEBCAM:
+            // Reuse the same logic as pressing C
+            ofApp::keyPressed('c');
+            break;
+        default:
+            break;
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Private helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+void ofApp::resetTracker() {
+    // Do NOT call tracker.exit() here — that invokes PyShutdown(), which
+    // permanently kills the Python interpreter for the lifetime of the process.
+    // Calling setup() again on the existing tracker is enough to flush stale
+    // state and re-initialise the MediaPipe pipeline.
+    tracker.setup();
+}
+
+string ofApp::sourceModeLabel() const {
+    switch (currentMode) {
+        case SourceMode::CAMERA: return "Webcam";
+        case SourceMode::VIDEO:  return "Video – " + ofFilePath::getBaseName(videoPlayer.getMoviePath());
+        case SourceMode::IMAGE:  return "Image – " + ofFilePath::getBaseName(loadedImage.getPixels().isAllocated() ? "file" : "");
+        default:                 return "";
+    }
 }
