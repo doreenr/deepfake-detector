@@ -4383,6 +4383,9 @@
 					../../../addons/ofxMediaPipePython/libs/pybind11/include,
 					../../../addons/ofxMediaPipePython/libs/python/include/python3.11,
 				);
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				INFOPLIST_KEY_NSCameraUsageDescription = "This app needs to access the camera";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app needs to access the microphone";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
 					"$(OF_CORE_LIBS)",
@@ -4541,6 +4544,9 @@
 					../../../addons/ofxMediaPipePython/libs/pybind11/include,
 					../../../addons/ofxMediaPipePython/libs/python/include/python3.11,
 				);
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				INFOPLIST_KEY_NSCameraUsageDescription = "This app needs to access the camera";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app needs to access the microphone";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
 					"$(OF_CORE_LIBS)",

@@ -1,4 +1,5 @@
 #include "ofApp.h"
+#include "ofAppGLFWWindow.h"
 
 void ofApp::setup() {
     ofSetFrameRate(30);
@@ -13,8 +14,8 @@ void ofApp::setup() {
     gui.setup();
 
     // HUD fonts – same family as the sidebar
-    hudFont    .load("IBMPlexSans-Regular.ttf",  12, true, true);
-    hudFontSemi.load("IBMPlexSans-SemiBold.ttf", 13, true, true);
+    hudFont    .load("IBMPlexSans-Regular.ttf",  48, true, true);
+    hudFontSemi.load("IBMPlexSans-SemiBold.ttf", 52, true, true);
 
     // Placeholder signal scores
     signalScores = {
@@ -37,10 +38,18 @@ void ofApp::update() {
     // signalScores[0].active = true;
 }
 
-// Small helper so we don't repeat the fallback logic in draw()
+// Draws text at logical position (x,y). Font is loaded at 2× for Retina
+// sharpness; we scale down by 0.5 so it renders at the correct logical size.
 static void hudText(const ofTrueTypeFont& f, const string& s, float x, float y) {
-    if (f.isLoaded()) f.drawString(s, x, y);
-    else              ofDrawBitmapString(s, x, y);
+    if (f.isLoaded()) {
+        ofPushMatrix();
+        ofTranslate(x, y);
+        ofScale(0.5f, 0.5f);
+        f.drawString(s, 0, 0);
+        ofPopMatrix();
+    } else {
+        ofDrawBitmapString(s, x, y);
+    }
 }
 
 void ofApp::draw() {
@@ -68,7 +77,6 @@ void ofApp::draw() {
     float sy = drawH / srcH;
 
     for (auto& face : tracker.getFaces()) {
-        // Bounding box
         ofNoFill();
         ofSetColor(0, 255, 0);
         ofSetLineWidth(2);
@@ -77,13 +85,11 @@ void ofApp::draw() {
                         face.bbox.width  * sx,
                         face.bbox.height * sy);
 
-        // Landmarks
         ofFill();
         ofSetColor(0, 200, 255, 150);
         for (auto& pt : face.landmarks)
             ofDrawCircle(drawX + pt.x * sx, drawY + pt.y * sy, 1.5f);
 
-        // Face-ID label
         ofSetColor(255);
         hudText(hudFont, "Face " + ofToString(face.id),
                 drawX + face.bbox.x * sx,
@@ -92,17 +98,17 @@ void ofApp::draw() {
 
     // ── 3. Video-area HUD ─────────────────────────────────────────────
     ofSetColor(255);
-    hudText(hudFontSemi, "Webcam",  drawX + 12, drawY + 18);
+    hudText(hudFontSemi, "Webcam", drawX + 24, drawY + 36);
 
     ofSetColor(180);
     hudText(hudFont, "Faces detected: " + ofToString(tracker.count()),
-            drawX + 12, drawY + 36);
+            drawX + 24, drawY + 72);
 
     // FPS – bottom-right corner
     ofSetColor(120);
     string fps = "FPS: " + ofToString((int)ofGetFrameRate());
-    float  fpsW = hudFont.isLoaded() ? hudFont.stringWidth(fps) : fps.size() * 8.0f;
-    hudText(hudFont, fps, ofGetWidth() - fpsW - 12, ofGetHeight() - 10);
+    float  fpsW = hudFont.isLoaded() ? hudFont.stringWidth(fps) * 0.5f : fps.size() * 8.0f;
+    hudText(hudFont, fps, ofGetWidth() - fpsW - 24, ofGetHeight() - 20);
 
     // ── 4. Sidebar (always on top) ────────────────────────────────────
     float composite = 0.5f; // TODO: replace with real weighted score

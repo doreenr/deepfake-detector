@@ -48,13 +48,13 @@ private:
     float tw(const ofTrueTypeFont& f, const string& s) const;
 
     // ── layout constants ─────────────────────────────────────────────
-    float sidebarW   = 380.0f;
-    float padX       = 20.0f;
-    float padY       = 24.0f;
-    float btnH       = 44.0f;
-    float btnGap     = 10.0f;
-    float rowH       = 54.0f;
-    float sectionGap = 20.0f;
+    float sidebarW   = 760.0f;
+    float padX       = 40.0f;
+    float padY       = 48.0f;
+    float btnH       = 88.0f;
+    float btnGap     = 20.0f;
+    float rowH       = 108.0f;
+    float sectionGap = 40.0f;
 
     // ── misc helpers ─────────────────────────────────────────────────
     AuthenticityLevel scoreToLevel(float score) const;
