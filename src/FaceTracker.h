@@ -9,6 +9,10 @@ struct Face {
     cv::Rect bbox;
     vector<glm::vec2> landmarks;  // 468+ points from MediaPipe face mesh
     cv::Mat cropped;              // BGR face crop
+    
+    // jitter variables
+    float jitterScore = 0.0f;
+    int jitterStatus = 0;
 };
 
 class FaceTracker {

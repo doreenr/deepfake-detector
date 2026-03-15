@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "FaceTracker.h"
 #include "BlinkAnalyzer.h"
+#include "JitterAnalyzer.h"
 #include <map>
 
 class ofApp : public ofBaseApp {
@@ -18,6 +19,7 @@ private:
     ofTexture videoTexture;
     FaceTracker tracker;
 
-    // one blink analyzer per face ID
+    // one blink and jitter analyzer per face ID
     map<int, BlinkAnalyzer> blinkAnalyzers;
+    map<int, JitterAnalyzer> jitterAnalyzers;
 };

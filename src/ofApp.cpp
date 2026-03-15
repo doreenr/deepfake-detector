@@ -19,10 +19,11 @@ void ofApp::update() {
         tracker.update(videoPixels);
         videoTexture.loadData(videoPixels);
 
-        // run blink analysis on each detected face
+        // run blink and jitter analysis on each detected face
         auto& faces = tracker.getFaces();
         for (auto& face : faces) {
             blinkAnalyzers[face.id].update(face.landmarks);
+            jitterAnalyzers[face.id].update(face.landmarks);
         }
     }
 }
@@ -42,9 +43,31 @@ void ofApp::draw() {
 
     auto& faces = tracker.getFaces();
     for (auto& face : faces) {
-        // draw bounding box
+        float bScore = 0.5f;
+        float jScore = 0.5f;
+
+        // calculate scores
+        auto bIt = blinkAnalyzers.find(face.id);
+        if (bIt != blinkAnalyzers.end()) {
+            bScore = bIt->second.getScore();
+        }
+        
+        auto jIt = jitterAnalyzers.find(face.id);
+        if (jIt != jitterAnalyzers.end()) {
+            jScore = jIt->second.getScore();
+        }
+
+        float masterScore = (bScore + jScore) / 2.0f;
+
+        // color the label and bbox by score: green=real, yellow: uncertain, red=fake
+        ofColor statusColour = ofColor(255, 50, 50);
+        if (masterScore >= 0.7f) statusColour = ofColor(0, 255, 0);
+        else if (masterScore >= 0.4f) statusColour = ofColor(255, 255, 0);
+
+
+        // draw bounding box      
         ofNoFill();
-        ofSetColor(0, 255, 0);
+        ofSetColor(statusColour);
         ofSetLineWidth(2);
         ofDrawRectangle(face.bbox.x * sx, face.bbox.y * sy,
                         face.bbox.width * sx, face.bbox.height * sy);
@@ -56,25 +79,25 @@ void ofApp::draw() {
             ofDrawCircle(pt.x * sx, pt.y * sy, 1.5);
         }
 
-        // blink analyzer info
-        auto it = blinkAnalyzers.find(face.id);
-        if (it != blinkAnalyzers.end()) {
-            auto& ba = it->second;
-            float score = ba.getScore();
+        // draw labels with analyzer info
+        float labelX = face.bbox.x * sx;
+        float labelY = face.bbox.y * sy;
 
-            // color the label by score: green=real, red=fake
-            if (score >= 0.7f) ofSetColor(0, 255, 0);
-            else if (score >= 0.4f) ofSetColor(255, 255, 0);
-            else ofSetColor(255, 50, 50);
+        ofSetColor(statusColour);
+        ofDrawBitmapString("Face " + ofToString(face.id) + " | Overall Score: " + ofToString(masterScore, 2), labelX, labelY - 40);
 
-            float labelX = face.bbox.x * sx;
-            float labelY = face.bbox.y * sy - 8;
+        if (bIt != blinkAnalyzers.end()) {
+            ofDrawBitmapString("BLINK | EAR: " + ofToString(bIt->second.getEAR(), 2)
+                             + " BPM: " + ofToString(bIt->second.getBPM(), 2)
+                             + " Score: " + ofToString(bScore, 2),
+                             labelX, labelY - 25);
+        }
 
-            ofDrawBitmapString("Face " + ofToString(face.id), labelX, labelY);
-            ofDrawBitmapString("EAR: " + ofToString(ba.getEAR(), 2)
-                             + "  BPM: " + ofToString(ba.getBPM(), 1)
-                             + "  Score: " + ofToString(score, 2),
-                             labelX, labelY + 14);
+        if (jIt != jitterAnalyzers.end()) {
+            ofDrawBitmapString("JITTER| Var: " + ofToString(jIt->second.getVariance(), 2)
+                             + " Jump: "+ ofToString(jIt->second.getMaxJump(), 1) 
+                             + " Score: " + ofToString(jScore, 2),
+                             labelX, labelY - 10);
         }
     }
 
