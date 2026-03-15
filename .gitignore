@@ -20,3 +20,4 @@ DerivedData/
 
 # reference files (local only)
 _reference/
+*.xcuserstate

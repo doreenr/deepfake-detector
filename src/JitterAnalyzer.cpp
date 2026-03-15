@@ -47,6 +47,8 @@ void JitterAnalyzer::update(const std::vector<glm::vec2>& landmarks) {
 
 
 void JitterAnalyzer::calculateScore() {
+    if (ofGetElapsedTimef() < 4.0f) { score = 0.5f; return; }
+    
     // variance score
     float varScore = 1.0f;
     if (currentVariance < 0.1f) {

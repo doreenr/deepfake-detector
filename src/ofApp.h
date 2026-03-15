@@ -2,24 +2,52 @@
 
 #include "ofMain.h"
 #include "FaceTracker.h"
+#include "GUI.h"
 #include "BlinkAnalyzer.h"
 #include "JitterAnalyzer.h"
 #include <map>
 
+// ── Source mode ───────────────────────────────────────────────────────────────
+enum class SourceMode { CAMERA, VIDEO, IMAGE };
+
 class ofApp : public ofBaseApp {
 public:
-    void setup() override;
-    void update() override;
-    void draw() override;
-    void exit() override;
+    void setup()              override;
+    void update()             override;
+    void draw()               override;
+    void exit()               override;
+    void keyPressed(int key)  override;
+    void mousePressed(int x, int y, int button) override;
 
 private:
+    // ── video sources ─────────────────────────────────────────────────
     ofVideoGrabber cam;
-    ofPixels videoPixels;
-    ofTexture videoTexture;
-    FaceTracker tracker;
+    ofVideoPlayer  videoPlayer;
+    ofImage        loadedImage;
+    SourceMode     currentMode = SourceMode::CAMERA;
 
-    // one blink and jitter analyzer per face ID
+    // ── shared frame data ─────────────────────────────────────────────
+    ofPixels       videoPixels;
+    ofTexture      videoTexture;
+
+    // ── subsystems ────────────────────────────────────────────────────
+    FaceTracker    tracker;
+    GUI            gui;
+
+    // ── blink analysis – one analyzer per face ID ─────────────────────
     map<int, BlinkAnalyzer> blinkAnalyzers;
+    
+    // ── jitter analysis – one analyzer per face ID ─────────────────────
     map<int, JitterAnalyzer> jitterAnalyzers;
+
+    // ── HUD fonts ─────────────────────────────────────────────────────
+    ofTrueTypeFont hudFont;
+    ofTrueTypeFont hudFontSemi;
+
+    // ── signal scores fed into the sidebar ────────────────────────────
+    vector<SignalScore> signalScores;
+
+    // ── helpers ───────────────────────────────────────────────────────
+    void resetTracker();
+    string sourceModeLabel() const;
 };
