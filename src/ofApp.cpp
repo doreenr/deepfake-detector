@@ -98,11 +98,11 @@ void ofApp::draw() {
 
     // ── 3. Video-area HUD ─────────────────────────────────────────────
     ofSetColor(255);
-    hudText(hudFontSemi, "Webcam", drawX + 24, drawY + 36);
+    hudText(hudFont, "Webcam", drawX + 24, drawY + 42);
 
-    ofSetColor(180);
+    ofSetColor(255);
     hudText(hudFont, "Faces detected: " + ofToString(tracker.count()),
-            drawX + 24, drawY + 72);
+            drawX + 24, drawY + 82);
 
     // FPS – bottom-right corner
     ofSetColor(120);

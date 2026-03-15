@@ -61,10 +61,11 @@ void GUI::setup() {
     // actual pixel density — otherwise glyphs are upscaled and look blurry.
     // Load at 2× physical pixels for sharp Retina rendering.
     // We draw text with ofScale(0.5) so it appears at the correct logical size.
-    fontReg .load("IBMPlexSans-Regular.ttf",  48, true, true);
-    fontSemi.load("IBMPlexSans-SemiBold.ttf", 52, true, true);
-    fontBold.load("IBMPlexSans-Bold.ttf",     52, true, true);
-    fontLg  .load("IBMPlexSans-Bold.ttf",     112, true, true);
+    fontReg  .load("IBMPlexSans-Regular.ttf",  48, true, true);
+    fontSemi .load("IBMPlexSans-SemiBold.ttf", 52, true, true);
+    fontBold .load("IBMPlexSans-Bold.ttf",     52, true, true);
+    fontTitle.load("IBMPlexSans-Bold.ttf",     80, true, true);  // larger app title
+    fontLg   .load("IBMPlexSans-Bold.ttf",     112, true, true);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -76,25 +77,20 @@ void GUI::draw(const vector<SignalScore>& scores, float composite) {
     float cursorY = padY;
 
     // ── Header ────────────────────────────────────────────────────────
-    cursorY += 36;
+    cursorY += 46;
     ofSetColor(COL_TITLE);
-    txt(fontBold, "DeepFake Detector", padX, cursorY);
-    cursorY += 36;
-
-    drawDivider(cursorY);
-    cursorY += 32;
+    txt(fontTitle, "DeepFake Detector", padX, cursorY);
+    cursorY += 100;
 
     // ── Source buttons ────────────────────────────────────────────────
     drawSourceButtons(cursorY);
 
-    drawDivider(cursorY);
-    cursorY += 32;
+    cursorY += 42;
 
     // ── Tracking scores ───────────────────────────────────────────────
     drawTrackingScores(scores, cursorY);
 
-    drawDivider(cursorY);
-    cursorY += 32;
+    cursorY += 42;
 
     // ── Authenticity section ──────────────────────────────────────────
     drawAuthenticitySection(composite, cursorY);
@@ -151,34 +147,25 @@ void GUI::drawSignalRow(const SignalScore& s, float x, float y, float w) {
     ofColor bg = s.active ? BG_CARD : BG_CARD_DIM;
     drawRoundRect(x, y, w, rowH, 12, bg);
 
-    if (!s.active) {
-        ofSetColor(COL_DIM);
-        string ph = s.label + " placeholder";
-        float phW = tw(fontReg, ph);
-        txt(fontReg, ph,
-            x + (w - phW) * 0.5f,
-            y + rowH * 0.5f + 10);
-        return;
-    }
+    // Vertical divider splitting label column from score column
+    float divX = x + w * 0.75f;
+    ofSetColor(COL_DIVIDER);
+    ofDrawLine(divX, y + 16, divX, y + rowH - 16);
 
-    // Label (top of card)
-    ofSetColor(COL_LABEL);
-    txt(fontSemi, s.label, x + 24, y + 34);
+    // Label — vertically centred in left column
+    ofSetColor(s.active ? COL_LABEL : COL_DIM);
+    txt(fontReg, s.label + " placeholder",
+        x + 24,
+        y + rowH * 0.5f + 10);
 
-    // Score bar
-    float barX = x + 24;
-    float barY = y + 60;
-    float barW = w - 48 - 104;
-    float barH = 16;
-    drawBar(barX, barY, barW, barH, s.score,
-            (s.score >= 0.65f) ? COL_GREEN :
-            (s.score >= 0.35f) ? COL_YELLOW : COL_RED);
-
-    // Numeric value (right-aligned in card)
-    ofSetColor(COL_SUBTITLE);
-    string val = ofToString(s.score, 2);
-    float  valW = tw(fontReg, val);
-    txt(fontReg, val, x + w - 24 - valW, y + 76);
+    // Score — vertically centred in right column
+    ofSetColor(s.active ? COL_TITLE : COL_DIM);
+    string val = s.active ? ofToString(s.score, 1) : "0.5";
+    float valW = tw(fontReg, val);
+    float rightColCX = divX + (x + w - divX) * 0.5f;
+    txt(fontReg, val,
+        rightColCX - valW * 0.5f,
+        y + rowH * 0.5f + 10);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -186,7 +173,7 @@ void GUI::drawAuthenticitySection(float composite, float startY) {
     AuthenticityLevel level = scoreToLevel(composite);
 
     ofSetColor(COL_TITLE);
-    txt(fontSemi, "Authenticity Score", padX, startY + 26);
+    txt(fontSemi, "Authenticity score", padX, startY + 26);
     float y = startY + 56;
 
     float cardW = sidebarW - padX * 2;
@@ -215,7 +202,7 @@ void GUI::drawAuthenticitySection(float composite, float startY) {
     ofColor labelColor = (level == AuthenticityLevel::AUTHENTIC) ? COL_GREEN  :
                          (level == AuthenticityLevel::UNCERTAIN)  ? COL_YELLOW :
                                                                     COL_RED;
-    ofSetColor(labelColor);
+    ofSetColor(COL_TITLE);  // always white
     txt(fontReg, label, padX, y + 26);
 }
 

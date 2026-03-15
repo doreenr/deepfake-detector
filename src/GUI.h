@@ -40,6 +40,7 @@ private:
     ofTrueTypeFont fontReg;
     ofTrueTypeFont fontSemi;
     ofTrueTypeFont fontBold;
+    ofTrueTypeFont fontTitle;  // larger bold font for the app title
     ofTrueTypeFont fontLg;
 
     // Draw string with baseline at (x, y); falls back to bitmap if not loaded.
