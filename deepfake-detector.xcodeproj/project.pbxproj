@@ -31,6 +31,7 @@
 		"95CD5F93-4816-45BF-A418-3408669F4D7F" /* ofxMediaPipeTracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "3965757E-5148-4615-92DC-22E0CD159118" /* ofxMediaPipeTracker.cpp */; };
 		"9623AA78-1928-466D-A4E1-9E894B2B3E66" /* ofxMediaPipeOscReceiver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "4A584373-58C3-4469-90F6-DF7C1D806034" /* ofxMediaPipeOscReceiver.cpp */; };
 		9A9AE7AA2F66ED2A007DC038 /* libpython3.11.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = "D8347559-E77C-4BF7-8D57-4847AD1FE9A1" /* libpython3.11.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		9A9AE7AD2F66EEF0007DC038 /* GUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A9AE7AC2F66EEEC007DC038 /* GUI.cpp */; };
 		"9C81C3DE-478C-4D24-9112-E97623FD953E" /* ETF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "386672BF-6EA2-4FFB-B129-CC5C76F2D42E" /* ETF.cpp */; };
 		"9CF623EE-91AB-47B8-886F-121D3E7F6CAD" /* Tracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "68BBC17A-39EE-4994-96BD-839208B27F31" /* Tracker.cpp */; };
 		"A1437762-E25E-49CD-A3CE-D2A9B6262655" /* ofxMediaPipeOscSender.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "824CD175-5A7D-427D-8564-EF6685758EE4" /* ofxMediaPipeOscSender.cpp */; };
@@ -822,6 +823,8 @@
 		"9A1F4848-6626-4C6F-9B49-7BBCE506F057" /* setobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = setobject.h; sourceTree = "<group>"; };
 		"9A4B7A25-D296-43EA-98B8-999DFFE07B71" /* warp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = warp.hpp; sourceTree = "<group>"; };
 		"9A58C781-C505-466C-9856-A61A151C93E4" /* color_detail.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = color_detail.hpp; sourceTree = "<group>"; };
+		9A9AE7AB2F66EEC7007DC038 /* GUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GUI.h; sourceTree = "<group>"; };
+		9A9AE7AC2F66EEEC007DC038 /* GUI.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GUI.cpp; sourceTree = "<group>"; };
 		"9B03ED29-49C1-413B-A272-54FC279D921A" /* imgcodecs_c.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = imgcodecs_c.h; sourceTree = "<group>"; };
 		"9B1EFC2C-3C49-48A2-BF27-E87EC4449AEE" /* interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = interface.h; sourceTree = "<group>"; };
 		"9B906CB6-BDFE-45D9-9547-2D7C6FEA5461" /* saving.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = saving.h; sourceTree = "<group>"; };
@@ -3730,6 +3733,8 @@
 		E4B69E1C0A3A1BDC003C02F2 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				9A9AE7AC2F66EEEC007DC038 /* GUI.cpp */,
+				9A9AE7AB2F66EEC7007DC038 /* GUI.h */,
 				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
 				E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */,
 				E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */,
@@ -4187,6 +4192,7 @@
 				"A1437762-E25E-49CD-A3CE-D2A9B6262655" /* ofxMediaPipeOscSender.cpp in Sources */,
 				"A8E7C49C-C40A-4498-B3DF-085C0BBE270A" /* ofxMediaPipePlayback.cpp in Sources */,
 				"35AD25A3-B654-4A16-A201-6138814FDDC1" /* ofxMediaPipePose.cpp in Sources */,
+				9A9AE7AD2F66EEF0007DC038 /* GUI.cpp in Sources */,
 				"2BEDF5AA-EF46-4F05-9C12-8851E88DDEB8" /* ofxMediaPipePoseTracker.cpp in Sources */,
 				"1F0DBE76-521D-4B15-8285-07FCCF3412E5" /* ofxMediaPipeRecorder.cpp in Sources */,
 				"67517BBD-FEDD-4451-8EDD-9C7D18DEBD05" /* ofxMediaPipeTrackedObject.cpp in Sources */,

@@ -1,0 +1,257 @@
+//
+//  GUI.cpp
+//  deepfake-detector
+//
+
+#include "GUI.h"
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Colour palette
+// ─────────────────────────────────────────────────────────────────────────────
+static const ofColor BG_SIDEBAR   (18,  20,  26);
+static const ofColor BG_CARD      (30,  33,  42);
+static const ofColor BG_CARD_DIM  (24,  27,  34);
+static const ofColor COL_DIVIDER  (50,  55,  68);
+static const ofColor COL_TITLE    (240, 240, 245);
+static const ofColor COL_SUBTITLE (160, 165, 178);
+static const ofColor COL_LABEL    (200, 205, 215);
+static const ofColor COL_DIM      (90,  95,  110);
+
+static const ofColor COL_GREEN      (40,  210,  80);
+static const ofColor COL_YELLOW     (230, 190,  20);
+static const ofColor COL_RED        (220,  40,  40);
+static const ofColor COL_GREEN_DIM  (10,   55,  20);
+static const ofColor COL_YELLOW_DIM (60,   50,  10);
+static const ofColor COL_RED_DIM    (60,   15,  15);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Font helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Draw text with its baseline at (x, y).
+// If the font failed to load we fall back to ofDrawBitmapString so the UI
+// stays functional even with a missing font file.
+void GUI::txt(const ofTrueTypeFont& f, const string& s, float x, float y) const {
+    if (f.isLoaded()) {
+        f.drawString(s, x, y);
+    } else {
+        ofDrawBitmapString(s, x, y);
+    }
+}
+
+float GUI::tw(const ofTrueTypeFont& f, const string& s) const {
+    if (f.isLoaded()) return f.stringWidth(s);
+    return s.size() * 8.0f;  // bitmap fallback: ~8px per char
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+void GUI::setup() {
+    // ofTrueTypeFont::load(path, size, antialiased, fullCharSet, contours, simplify)
+    // Paths are relative to bin/data/
+    fontReg .load("IBMPlexSans-Regular.ttf",  12, true, true);
+    fontSemi.load("IBMPlexSans-SemiBold.ttf", 13, true, true);
+    fontBold.load("IBMPlexSans-Bold.ttf",     13, true, true);
+    fontLg  .load("IBMPlexSans-Bold.ttf",     28, true, true);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Main draw entry point
+// ─────────────────────────────────────────────────────────────────────────────
+void GUI::draw(const vector<SignalScore>& scores, float composite) {
+    drawBackground();
+
+    float cursorY = padY;
+
+    // ── Header ────────────────────────────────────────────────────────
+    // fontBold baseline sits ~13px below the cap height, so add some room.
+    cursorY += 18;
+    ofSetColor(COL_TITLE);
+    txt(fontBold, "DeepFake Detector", padX, cursorY);
+    cursorY += 18;
+
+    drawDivider(cursorY);
+    cursorY += 16;
+
+    // ── Source buttons ────────────────────────────────────────────────
+    drawSourceButtons(cursorY);
+
+    drawDivider(cursorY);
+    cursorY += 16;
+
+    // ── Tracking scores ───────────────────────────────────────────────
+    drawTrackingScores(scores, cursorY);
+
+    drawDivider(cursorY);
+    cursorY += 16;
+
+    // ── Authenticity section ──────────────────────────────────────────
+    drawAuthenticitySection(composite, cursorY);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+void GUI::drawBackground() {
+    ofSetColor(BG_SIDEBAR);
+    ofDrawRectangle(0, 0, sidebarW, ofGetHeight());
+    ofSetColor(COL_DIVIDER);
+    ofDrawLine(sidebarW - 1, 0, sidebarW - 1, ofGetHeight());
+}
+
+void GUI::drawDivider(float y) {
+    ofSetColor(COL_DIVIDER);
+    ofDrawLine(padX, y, sidebarW - padX, y);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+void GUI::drawSourceButtons(float& cursorY) {
+    float btnW = sidebarW - padX * 2;
+
+    auto drawBtn = [&](const string& label, float y) {
+        drawRoundRect(padX, y, btnW, btnH, 6, BG_CARD);
+        ofSetColor(COL_LABEL);
+        float labelW = tw(fontReg, label);
+        txt(fontReg, label,
+            padX + (btnW - labelW) * 0.5f,
+            y + btnH * 0.5f + 5);   // +5 ≈ half cap-height for vertical centre
+    };
+
+    drawBtn("Upload video",    cursorY);
+    cursorY += btnH + btnGap;
+    drawBtn("Switch to webcam", cursorY);
+    cursorY += btnH + sectionGap;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+void GUI::drawTrackingScores(const vector<SignalScore>& scores, float& cursorY) {
+    ofSetColor(COL_TITLE);
+    txt(fontSemi, "Tracking scores", padX, cursorY + 13);
+    cursorY += 28;
+
+    float rowW = sidebarW - padX * 2;
+    for (auto& s : scores) {
+        drawSignalRow(s, padX, cursorY, rowW);
+        cursorY += rowH + 6;
+    }
+    cursorY += sectionGap - 6;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+void GUI::drawSignalRow(const SignalScore& s, float x, float y, float w) {
+    ofColor bg = s.active ? BG_CARD : BG_CARD_DIM;
+    drawRoundRect(x, y, w, rowH, 6, bg);
+
+    if (!s.active) {
+        ofSetColor(COL_DIM);
+        string ph = s.label + " placeholder";
+        float phW = tw(fontReg, ph);
+        txt(fontReg, ph,
+            x + (w - phW) * 0.5f,
+            y + rowH * 0.5f + 5);
+        return;
+    }
+
+    // Label (top of card)
+    ofSetColor(COL_LABEL);
+    txt(fontSemi, s.label, x + 12, y + 17);
+
+    // Score bar
+    float barX = x + 12;
+    float barY = y + 30;
+    float barW = w - 24 - 52;
+    float barH = 8;
+    drawBar(barX, barY, barW, barH, s.score,
+            (s.score >= 0.65f) ? COL_GREEN :
+            (s.score >= 0.35f) ? COL_YELLOW : COL_RED);
+
+    // Numeric value (right-aligned in card)
+    ofSetColor(COL_SUBTITLE);
+    string val = ofToString(s.score, 2);
+    float  valW = tw(fontReg, val);
+    txt(fontReg, val, x + w - 12 - valW, y + 38);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+void GUI::drawAuthenticitySection(float composite, float startY) {
+    AuthenticityLevel level = scoreToLevel(composite);
+
+    // Section title
+    ofSetColor(COL_TITLE);
+    txt(fontSemi, "Authenticity Score", padX, startY + 13);
+    float y = startY + 28;
+
+    // Card
+    float cardW = sidebarW - padX * 2;
+    float cardH = 72;
+    drawRoundRect(padX, y, cardW, cardH, 8, BG_CARD);
+
+    float tlCX = padX + 96;
+    float tlCY = y + cardH * 0.5f;
+    drawHorizontalTrafficLight(tlCX, tlCY, level);
+
+    // Vertical divider inside card
+    float divX = padX + cardW * 0.56f;
+    ofSetColor(COL_DIVIDER);
+    ofDrawLine(divX, y + 10, divX, y + cardH - 10);
+
+    // Large score number — centred in the right half of the card
+    string scoreStr = ofToString(composite, 1);
+    float  scoreW   = tw(fontLg, scoreStr);
+    float  rightHalfCX = divX + (padX + cardW - divX) * 0.5f;
+    ofSetColor(COL_TITLE);
+    txt(fontLg, scoreStr,
+        rightHalfCX - scoreW * 0.5f,
+        tlCY + 10);   // +10 ≈ half of fontLg cap-height
+
+    y += cardH + 12;
+
+    // Result label
+    string label = (level == AuthenticityLevel::AUTHENTIC) ? "Result: authentic" :
+                   (level == AuthenticityLevel::UNCERTAIN)  ? "Result: uncertain" :
+                                                              "Result: fake";
+    ofColor labelColor = (level == AuthenticityLevel::AUTHENTIC) ? COL_GREEN  :
+                         (level == AuthenticityLevel::UNCERTAIN)  ? COL_YELLOW :
+                                                                    COL_RED;
+    ofSetColor(labelColor);
+    txt(fontReg, label, padX, y + 13);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+void GUI::drawHorizontalTrafficLight(float cx, float cy, AuthenticityLevel level) {
+    float bulbR   = 18;
+    float spacing = 46;
+
+    bool redOn   = (level == AuthenticityLevel::FAKE);
+    bool yellOn  = (level == AuthenticityLevel::UNCERTAIN);
+    bool greenOn = (level == AuthenticityLevel::AUTHENTIC);
+
+    ofSetColor(redOn   ? COL_RED    : COL_RED_DIM);
+    ofDrawCircle(cx - spacing, cy, bulbR);
+
+    ofSetColor(yellOn  ? COL_YELLOW : COL_YELLOW_DIM);
+    ofDrawCircle(cx, cy, bulbR);
+
+    ofSetColor(greenOn ? COL_GREEN  : COL_GREEN_DIM);
+    ofDrawCircle(cx + spacing, cy, bulbR);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+AuthenticityLevel GUI::scoreToLevel(float score) const {
+    if (score >= 0.65f) return AuthenticityLevel::AUTHENTIC;
+    if (score >= 0.35f) return AuthenticityLevel::UNCERTAIN;
+    return AuthenticityLevel::FAKE;
+}
+
+void GUI::drawRoundRect(float x, float y, float w, float h, float r,
+                        ofColor fill, float alpha) {
+    ofSetColor(fill.r, fill.g, fill.b, (int)alpha);
+    ofDrawRectRounded(x, y, w, h, r);
+}
+
+void GUI::drawBar(float x, float y, float w, float h,
+                  float value, ofColor barColor) {
+    ofSetColor(COL_DIVIDER);
+    ofDrawRectRounded(x, y, w, h, h * 0.5f);
+    ofSetColor(barColor);
+    float filled = ofClamp(value, 0, 1) * w;
+    if (filled > 0)
+        ofDrawRectRounded(x, y, filled, h, h * 0.5f);
+}
