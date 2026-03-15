@@ -2,6 +2,8 @@
 
 #include "ofMain.h"
 #include "FaceTracker.h"
+#include "BlinkAnalyzer.h"
+#include <map>
 
 class ofApp : public ofBaseApp {
 public:
@@ -15,4 +17,7 @@ private:
     ofPixels videoPixels;
     ofTexture videoTexture;
     FaceTracker tracker;
+
+    // one blink analyzer per face ID
+    map<int, BlinkAnalyzer> blinkAnalyzers;
 };
