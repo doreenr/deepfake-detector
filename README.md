@@ -1,48 +1,100 @@
 # Deepfake Detector
 
-Real-time deepfake / authenticity detection using openFrameworks.
+Real-time deepfake / authenticity detection using openFrameworks + MediaPipe.
 
-Work in progress — right now it just runs the webcam. Face detection and the actual analysis come next.
+Work in progress — right now we have face tracking working with MediaPipe's 468-point face mesh. Detection algorithms are coming next.
 
-## Setup (macOS)
+## Setup
 
 ### 1. Get openFrameworks
 
-Download **oF 0.12.1** from [openframeworks.cc/download](https://openframeworks.cc/download/) and unzip it somewhere (e.g. `~/Documents/of_v0.12.1_osx_release/`).
+Download **oF 0.12.1** from [openframeworks.cc/download](https://openframeworks.cc/download/) and unzip it.
 
-### 2. Clone this repo
+- **macOS**: we used `~/Documents/of_v0.12.1_osx_release/`
+- **Linux**: `~/openFrameworks/` or wherever you want
 
-This needs to live inside the oF folder structure:
+If you're on Linux, you also need to install dependencies and compile oF first:
+```bash
+cd openFrameworks/scripts/linux/ubuntu
+sudo ./install_dependencies.sh
+cd ..
+./compileOF.sh -j4
+```
+
+### 2. Install addons
+
+We need two addons. Clone them into the oF addons folder:
 
 ```bash
-cd ~/Documents/of_v0.12.1_osx_release/apps/myApps/
+cd <of path>/addons
+git clone https://github.com/design-io/ofxMediaPipePython.git
+git clone https://github.com/kylemcdonald/ofxCv.git
+```
+
+### 3. Set up MediaPipe
+
+This is the annoying part. The addon uses Python 3.11 + MediaPipe via pybind11, so there's some setup involved. Luckily there's an install script that handles most of it:
+
+```bash
+cd ofxMediaPipePython
+bash InstallMediaPipe.sh
+```
+
+It'll create a conda environment, install python 3.11, and copy the libs into the addon.
+
+**If you're on Apple Silicon:** the script tries to install mediapipe 0.10.9 which doesn't exist for arm64. It'll fail on that step but everything else still gets set up. Just run this after:
+```bash
+conda activate mediapipe
+pip install mediapipe
+```
+
+### 4. Clone this repo
+
+```bash
+cd <of path>/apps/myApps/
 git clone https://github.com/Mista-Kev/deepfake-detector.git
 ```
 
-### 3. Build & run
+### 5. Copy the face model
+
+MediaPipe needs a model file to do face detection. It comes with the addon, you just need to put it where the app can find it:
 
 ```bash
 cd deepfake-detector
+mkdir -p bin/data
+cp <of path>/addons/ofxMediaPipePython/tasks/face_landmarker_v2_with_blendshapes.task bin/data/
+```
+
+### 6. Build & run
+
+```bash
 make -j4
+```
+
+**macOS only** — you need to copy the python dylib into the app bundle, otherwise it crashes on launch:
+```bash
+cp <of path>/addons/ofxMediaPipePython/libs/python/lib/osx/libpython3.11.dylib bin/deepfake-detector.app/Contents/MacOS/
+```
+
+Then:
+```bash
 make RunRelease
 ```
 
-That's it. You should see a window with your webcam feed.
+If everything went right you should see your webcam with green bounding boxes around faces and blue landmark dots.
 
-### Camera gotchas on macOS
+### Camera issues on macOS
 
-This took us a while to figure out so writing it down:
+Some stuff that tripped us up:
 
-- **Permission dialog**: The first time you run the app, macOS will ask for camera access. The app might not get any frames until you approve it and restart. This is normal.
-- **Device ID**: `cam.setDeviceID(0)` grabs the built-in webcam. If you're using a USB camera, try `1` or `2`. There's no great way to list them from oF, just trial and error.
-- **`initGrabber` is deprecated** in oF 0.12 — use `cam.setup(width, height)` instead. Old examples and tutorials still use `initGrabber`, it works but throws a warning.
-- **Resolution**: We request 1280x720 but the actual resolution depends on your camera. The app scales to fill the window either way.
-- If the camera just shows a black screen, check System Settings > Privacy > Camera and make sure your terminal / IDE has access.
+- **Permission dialog**: First time running, macOS asks for camera access. You might need to restart the app after granting it.
+- **Device ID**: `cam.setDeviceID(0)` is the built-in webcam. USB cameras are usually `1` or `2`, just trial and error.
+- **Black screen**: Check System Settings > Privacy > Camera and make sure your terminal has access.
+- **Resolution**: We request 1280x720 but your camera might give something different. The app scales either way so it's fine.
 
-### Addons needed (later)
+### Linux
 
-Right now the project doesn't use any addons. Once we add face tracking we'll need:
-- `ofxCv`
-- `ofxFaceTracker2`
-
-Instructions for setting those up will follow.
+On Linux you might need to set the library path before running:
+```bash
+export LD_LIBRARY_PATH=<of path>/addons/ofxMediaPipePython/libs/python/lib/linux64:$LD_LIBRARY_PATH
+```
