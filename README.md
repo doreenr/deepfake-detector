@@ -98,3 +98,19 @@ On Linux you might need to set the library path before running:
 ```bash
 export LD_LIBRARY_PATH=<of path>/addons/ofxMediaPipePython/libs/python/lib/linux64:$LD_LIBRARY_PATH
 ```
+## FFT Analyzer — Limitations
+
+The FFT analyzer computes the ratio of high-frequency energy in the
+face crop's magnitude spectrum. GAN-generated faces sometimes exhibit
+elevated high-frequency artifacts from transposed convolution upsampling,
+which this tries to detect.
+
+**Known limitations:**
+- Thresholds are heuristic and not trained on a labelled dataset
+- Results vary significantly with video codec, resolution, and compression
+  level — a heavily compressed real face can score similarly to a GAN face
+- Works best on high-quality, uncompressed input
+- Should be treated as a weak signal only; weight it lower than blink
+  and jitter analysis until properly calibrated
+- A production implementation would replace the threshold logic with a
+  classifier trained on a labelled real/fake dataset (e.g. FaceForensics++)

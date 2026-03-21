@@ -30,6 +30,9 @@
 		"8610B7DD-9F03-4C94-BB99-5930573B2C72" /* ofxMediaPipeUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "26B3B0DE-71A9-4CB4-AE72-67D56BAE8114" /* ofxMediaPipeUtils.cpp */; };
 		"95CD5F93-4816-45BF-A418-3408669F4D7F" /* ofxMediaPipeTracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "3965757E-5148-4615-92DC-22E0CD159118" /* ofxMediaPipeTracker.cpp */; };
 		"9623AA78-1928-466D-A4E1-9E894B2B3E66" /* ofxMediaPipeOscReceiver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "4A584373-58C3-4469-90F6-DF7C1D806034" /* ofxMediaPipeOscReceiver.cpp */; };
+		9A222AD92F6EDC6D006CDA9D /* JitterAnalyzer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A222AD82F6EDC6D006CDA9D /* JitterAnalyzer.cpp */; };
+		9A222ADA2F6EDC6D006CDA9D /* Analyzer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A222AD62F6EDC6D006CDA9D /* Analyzer.cpp */; };
+		9A222ADD2F6EE002006CDA9D /* FFTAnalyzer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A222ADC2F6EDFFF006CDA9D /* FFTAnalyzer.cpp */; };
 		9A6062D82F67436C00FF248D /* BlinkAnalyzer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A6062D72F67436C00FF248D /* BlinkAnalyzer.cpp */; };
 		9A9AE7AA2F66ED2A007DC038 /* libpython3.11.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = "D8347559-E77C-4BF7-8D57-4847AD1FE9A1" /* libpython3.11.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		9A9AE7AD2F66EEF0007DC038 /* GUI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9A9AE7AC2F66EEEC007DC038 /* GUI.cpp */; };
@@ -822,6 +825,12 @@
 		"99AF84CE-4E8A-465F-A517-42F17C62C147" /* twist.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = twist.hpp; sourceTree = "<group>"; };
 		"99EF32DA-0B36-42D1-A009-B05C9CBB7A2C" /* ml.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ml.hpp; sourceTree = "<group>"; };
 		"9A1F4848-6626-4C6F-9B49-7BBCE506F057" /* setobject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = setobject.h; sourceTree = "<group>"; };
+		9A222AD52F6EDC6D006CDA9D /* Analyzer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Analyzer.h; sourceTree = "<group>"; };
+		9A222AD62F6EDC6D006CDA9D /* Analyzer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Analyzer.cpp; sourceTree = "<group>"; };
+		9A222AD72F6EDC6D006CDA9D /* JitterAnalyzer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JitterAnalyzer.h; sourceTree = "<group>"; };
+		9A222AD82F6EDC6D006CDA9D /* JitterAnalyzer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = JitterAnalyzer.cpp; sourceTree = "<group>"; };
+		9A222ADB2F6EDFD1006CDA9D /* FFTAnalyzer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FFTAnalyzer.h; sourceTree = "<group>"; };
+		9A222ADC2F6EDFFF006CDA9D /* FFTAnalyzer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FFTAnalyzer.cpp; sourceTree = "<group>"; };
 		"9A4B7A25-D296-43EA-98B8-999DFFE07B71" /* warp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = warp.hpp; sourceTree = "<group>"; };
 		"9A58C781-C505-466C-9856-A61A151C93E4" /* color_detail.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = color_detail.hpp; sourceTree = "<group>"; };
 		9A6062D62F67436C00FF248D /* BlinkAnalyzer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BlinkAnalyzer.h; sourceTree = "<group>"; };
@@ -3736,6 +3745,12 @@
 		E4B69E1C0A3A1BDC003C02F2 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				9A222ADC2F6EDFFF006CDA9D /* FFTAnalyzer.cpp */,
+				9A222ADB2F6EDFD1006CDA9D /* FFTAnalyzer.h */,
+				9A222AD52F6EDC6D006CDA9D /* Analyzer.h */,
+				9A222AD62F6EDC6D006CDA9D /* Analyzer.cpp */,
+				9A222AD72F6EDC6D006CDA9D /* JitterAnalyzer.h */,
+				9A222AD82F6EDC6D006CDA9D /* JitterAnalyzer.cpp */,
 				9A6062D62F67436C00FF248D /* BlinkAnalyzer.h */,
 				9A6062D72F67436C00FF248D /* BlinkAnalyzer.cpp */,
 				9A9AE7AC2F66EEEC007DC038 /* GUI.cpp */,
@@ -4164,6 +4179,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9A222ADD2F6EE002006CDA9D /* FFTAnalyzer.cpp in Sources */,
 				9A6062D82F67436C00FF248D /* BlinkAnalyzer.cpp in Sources */,
 				E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */,
 				E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */,
@@ -4188,6 +4204,8 @@
 				"9CF623EE-91AB-47B8-886F-121D3E7F6CAD" /* Tracker.cpp in Sources */,
 				"2F9F2416-1DF2-477B-AEB8-39A531114009" /* Utilities.cpp in Sources */,
 				"D7E84FA6-0794-4A93-B290-5CFFB6987E0B" /* Wrappers.cpp in Sources */,
+				9A222AD92F6EDC6D006CDA9D /* JitterAnalyzer.cpp in Sources */,
+				9A222ADA2F6EDC6D006CDA9D /* Analyzer.cpp in Sources */,
 				"1FAA28D8-EEA9-40FF-B3F7-6E175D8EA6DC" /* libpython3.11.dylib in Sources */,
 				"EC22F6D7-7BFD-4B62-A891-82D78B7506F7" /* ofxMediaPipeFace.cpp in Sources */,
 				"71AFCD1B-8E6F-4AF5-A2DC-66AC2E37526D" /* ofxMediaPipeFaceTracker.cpp in Sources */,

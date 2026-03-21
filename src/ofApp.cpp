@@ -57,10 +57,11 @@ void ofApp::update() {
         videoTexture.loadData(videoPixels);
         tracker.update(videoPixels);
 
-        // Run blink and jitter analysis on each detected face
+        // Run analysis on each detected face
         for (auto& face : tracker.getFaces()) {
             blinkAnalyzers[face.id].update(face.landmarks);
             jitterAnalyzers[face.id].update(face.landmarks);
+            fftAnalyzers[face.id].update(face.cropped);
         }
 
         // Wire scores into the sidebar – use face 0 if present
@@ -74,7 +75,7 @@ void ofApp::update() {
             signalScores[0].active = false;
         }
 
-        signalScores[1].label  = "Landmark jitter analysis";
+        signalScores[1].label = "Landmark jitter analysis";
         if (!tracker.getFaces().empty()) {
             int id = tracker.getFaces()[0].id;
             signalScores[1].score  = jitterAnalyzers[id].getScore();
@@ -82,11 +83,16 @@ void ofApp::update() {
         } else {
             signalScores[1].active = false;
         }
-    }
 
-    // TODO: replace with real detector outputs, e.g.:
-    // signalScores[0].score  = blinkDetector.getScore();
-    // signalScores[0].active = true;
+        signalScores[2].label = "Spatial FFT analysis";
+        if (!tracker.getFaces().empty()) {
+            int id = tracker.getFaces()[0].id;
+            signalScores[2].score  = fftAnalyzers[id].getScore();
+            signalScores[2].active = true;
+        } else {
+            signalScores[2].active = false;
+        }
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -311,6 +317,7 @@ void ofApp::resetTracker() {
     tracker.setup();
     blinkAnalyzers.clear();
     jitterAnalyzers.clear();
+    fftAnalyzers.clear();
     setup();
 }
 
