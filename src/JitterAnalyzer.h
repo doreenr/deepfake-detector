@@ -9,6 +9,8 @@
 class JitterAnalyzer : public Analyzer {
     std::deque<float> distanceHistory;
     glm::vec2 previousPosition;
+    glm::vec2 previousVelocity = glm::vec2(0,0);
+    
     float currentVariance = 0.0f;
     float maxJump = 0.0f;
 
