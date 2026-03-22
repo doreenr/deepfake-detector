@@ -8,7 +8,7 @@ Work in progress — detection algorithms are heuristic and not trained on a lab
 
 ## How It Works
 
-Each frame, the app detects faces and runs three independent analyzers. Their scores are averaged into a composite authenticity score shown in the sidebar.
+Each frame, the app detects faces and runs three independent analyzers. Their scores are combined into a smoothed composite authenticity score shown in the sidebar.
 
 ### Blink Analysis (`BlinkAnalyzer`)
 
@@ -25,12 +25,12 @@ Real people blink ~12–25 times per minute with irregular gaps. Deepfakes and p
 
 Real head movement produces natural, irregular micro-motion. Deepfakes can appear frozen, or exhibit unnatural frame-to-frame jumps from unstable warping.
 
-**What it measures:** Frame-to-frame displacement of nose tip landmark (point 4) over a 30-frame rolling window.
+**What it measures:** Frame-to-frame acceleration of the nose tip landmark (point 4), normalized by interocular distance (IOD) to be scale-independent, over a 30-frame rolling window.
 
 **Scoring:**
-- Very low variance (< 0.1) → frozen image, lower score
-- Very high variance (> 15.0) → flickering artifact, lower score
-- Large single jumps (> 12px) → teleport artifact, lower score
+- Very low variance (< 0.00008) → frozen / AI temporal smoothing, lower score
+- Very high variance (> 0.02) → flickering artifact, lower score
+- Large single jump (> 0.5 normalized) → teleport artifact, lower score
 - Weighted 60% variance, 40% max jump
 
 ### FFT Spatial Analysis (`FFTAnalyzer`)
@@ -48,12 +48,12 @@ GAN-generated faces can leave artifacts in the frequency domain — upsampling v
 - Thresholds are heuristic, not trained on a labelled dataset
 - Results vary with video codec, resolution, and compression — a heavily compressed real face can score similarly to a GAN face
 - Works best on high-quality, uncompressed input
-- Should be treated as a weak signal; weight it lower than blink and jitter until properly calibrated
+- Currently weighted at 10% of the composite score, with blink and jitter each at 45%
 - A production implementation would replace the threshold logic with a classifier trained on a dataset such as FaceForensics++
 
 ### Composite Score
 
-The composite score is the mean of all active analyzer scores. A score ≥ 0.7 is shown as authentic (green), 0.6–0.7 as uncertain (yellow), and below 0.6 as fake (red). All analyzers wait 4 seconds before scoring to allow the signal buffers to fill.
+The composite score is a weighted average of active analyzer scores — blink and jitter each contribute 45%, FFT 10% — normalized by the total weight of whichever analyzers are currently active. The score is smoothed with an exponential moving average (α=0.15) to prevent flickering. A score ≥ 0.65 is shown as authentic (green), 0.45–0.65 as uncertain (yellow), and below 0.45 as fake (red). All analyzers wait 4 seconds before scoring to allow signal buffers to fill.
 
 ---
 
