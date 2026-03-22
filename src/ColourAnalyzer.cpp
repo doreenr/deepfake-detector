@@ -68,11 +68,7 @@ void ColourAnalyzer::update(const std::vector<glm::vec2>& landmarks, const cv::M
     calculateScore();
 
     // ------------------ TEST ----------------
-ofxCv::toOf(innerMask, innerVisual);
-ofxCv::toOf(outerMask, outerVisual);
 
-innerVisual.update();
-outerVisual.update();
 
 cv::Scalar meanInner, stdDevInner;
 cv::Scalar meanOuter, stdDevOuter;
@@ -106,5 +102,5 @@ float targetScore = 0.5f;
     else {
         targetScore = 0.55f; // UNCERTAIN
     }
-    score = targetScore
+    score = targetScore;
 }

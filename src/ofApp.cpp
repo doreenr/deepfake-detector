@@ -198,28 +198,6 @@ void ofApp::draw() {
         //                      + " Score: " + ofToString(jScore, 2),
         //                      labelX, labelY - 10);
         // }
-
-auto cIt = colourAnalyzers.find(face.id);
-    if (cIt != colourAnalyzers.end()) {
-        
-        // Move to the face position
-        ofPushMatrix();
-        ofTranslate(drawX, drawY);
-        ofScale(sx, sy);
-
-        ofEnableBlendMode(OF_BLENDMODE_ADD); // Makes them look like a "hologram"
-        
-        // Draw Inner Mask in Blue
-        ofSetColor(0, 100, 255, 180); 
-        cIt->second.innerVisual.draw(0, 0);
-
-        // Draw Outer Ring in Green
-        ofSetColor(0, 255, 100, 180);
-        cIt->second.outerVisual.draw(0, 0);
-
-        ofDisableBlendMode();
-        ofPopMatrix();
-    }
     }
 
     // ── 3. Video-area HUD ─────────────────────────────────────────────
