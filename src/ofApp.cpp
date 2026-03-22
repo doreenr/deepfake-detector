@@ -238,8 +238,10 @@ void ofApp::draw() {
             activeCount++;
         }
     }
+    // add smoothing 
     float composite = (activeCount > 0) ? (sum / activeCount) : 0.5f;
-    gui.draw(signalScores, composite);
+    smoothedComposite = smoothedComposite * 0.85f + composite * 0.15f;
+    gui.draw(signalScores, smoothedComposite);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
