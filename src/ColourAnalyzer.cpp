@@ -81,8 +81,6 @@ void ColourAnalyzer::update(const std::vector<glm::vec2>& landmarks, const cv::M
 void ColourAnalyzer::calculateScore() {
     if (ofGetElapsedTimef() < 4.0f) { score = 0.5f; return; }
 
-    std::cout << "Bhattacharyya Dist: " << currentBhattacharyyaDist << std::endl;
-
     float thresSafe = 0.92f;
     float thresFake = 0.98f;
     float targetScore = 0.5f;

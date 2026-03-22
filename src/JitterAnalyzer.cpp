@@ -66,7 +66,6 @@ void JitterAnalyzer::update(const std::vector<glm::vec2>& landmarks, const cv::M
 
 void JitterAnalyzer::calculateScore() {
 
-    std::cout << "Var: " << currentVariance << " | MaxJump: " << maxJump << std::endl;
     if (ofGetElapsedTimef() < 4.0f) { score = 0.5f; return; }
     
     // Variance score
