@@ -45,7 +45,17 @@ void ColourAnalyzer::update(const std::vector<glm::vec2>& landmarks, const cv::M
     cv::inRange(ycrcbFrame, cv::Scalar(0, 133, 77), cv::Scalar(255, 173, 127), skinThresholdMask);
     
     // intersect geometric ring with skin pixels
-    cv::bitwise_and(outerMask, skinThresholdMask, outerMask);
+    cv::Mat skinOnly;
+    cv::bitwise_and(outerMask, skinThresholdMask, skinOnly);
+
+    // fall back to raw geometric ring if pixels too few after filtering
+    int skinPixelCount = cv::countNonZero(outerMask);
+
+    if (skinPixelCount > 500) {
+        outerMask = skinOnly;
+    } else {
+        std::cout << "WARNING: Skin filter starved. Falling back to raw ring." << std::endl;
+    }
 
     // calculate histograms (Cb and Cr channels)
     int channels[] = {1, 2};
@@ -68,7 +78,11 @@ void ColourAnalyzer::update(const std::vector<glm::vec2>& landmarks, const cv::M
     calculateScore();
 
     // ------------------ TEST ----------------
+ofxCv::toOf(innerMask, innerVisual);
+ofxCv::toOf(outerMask, outerVisual);
 
+innerVisual.update();
+outerVisual.update();
 
 cv::Scalar meanInner, stdDevInner;
 cv::Scalar meanOuter, stdDevOuter;
@@ -91,16 +105,19 @@ void ColourAnalyzer::calculateScore() {
     // TEST
     std::cout << "Bhattacharyya Dist: " << currentBhattacharyyaDist << std::endl;
 
-float targetScore = 0.5f;
+    float thresSafe = 0.92f;
+    float thresFake = 0.98f;
+    float targetScore = 0.5f;
 
-    if (currentBhattacharyyaDist < 0.75f) {
-        targetScore = 0.9f;  // REAL: Your current values fall safely here now
+    if (currentBhattacharyyaDist < thresSafe) { // real
+        targetScore = 1.0f; 
     } 
-    else if (currentBhattacharyyaDist > 0.88f) {
-        targetScore = 0.1f;  // FAKE: Significant divergence from skin baseline
+    else if (currentBhattacharyyaDist < thresFake) { // uncertain, map distance to score
+        targetScore = ofMap(currentBhattacharyyaDist, thresSafe, thresFake, 1.0f, 0.0f);
     } 
-    else {
-        targetScore = 0.55f; // UNCERTAIN
+    else { // fake
+        targetScore = 0.0f;
     }
-    score = targetScore;
+
+    score = ofLerp(score, targetScore, 0.1f); // smooth score
 }

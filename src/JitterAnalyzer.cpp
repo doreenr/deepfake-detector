@@ -73,12 +73,12 @@ void JitterAnalyzer::calculateScore() {
     float varScore = 1.0f;
     if (currentVariance < 0.00008f) {
         varScore = 0.1f; // too smoothed (AI temporal smoothing)
-    } else if (currentVariance < 0.0001f) {
-        varScore = 0.4f; // too still
-    } else if (currentVariance > 0.02f) {
-        varScore = 0.2f; // flickering (AI noise)
-    } else if (currentVariance > 0.01f) {
-        varScore = 0.5f; // too erratic
+    } else if (currentVariance < 0.0001f) { // suspiciously still
+        varScore = ofMap(currentVariance, 0.00008f, 0.0001f, 0.1f, 0.5f, true);
+    } else if (currentVariance > 0.02f) { // flickering (AI noise)
+        varScore = 0.2f;
+    } else if (currentVariance > 0.01f) { // suspiciously erratic
+        varScore = ofMap(currentVariance, 0.01f, 0.02f, 0.1f, 0.5f, true);
     }
 
     // Max jump score
@@ -92,5 +92,5 @@ void JitterAnalyzer::calculateScore() {
     }
 
     // weighted sum of variance and max jump
-    score = (varScore * 0.6f) + (jumpScore * 0.4f);
+    score = ofLerp(score, varScore * 0.6f + jumpScore * 0.4f, 0.1f); // smooth score
 }

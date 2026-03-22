@@ -118,6 +118,9 @@ void ofApp::draw() {
     float areaW = ofGetWidth()  - sbW;
     float areaH = ofGetHeight();
 
+    float weights[] = {0.3f, 0.3f, 0.1f, 0.3f}; // blink, jitter, FFT, histogram
+
+
     // ── 1. Letterboxed video feed ─────────────────────────────────────
     // Use the actual frame dimensions so any source aspect ratio letterboxes
     // correctly (not just 1280x720 webcam feeds).
@@ -146,7 +149,8 @@ void ofApp::draw() {
         float f = fftAnalyzers.count(face.id)    ? fftAnalyzers[face.id].getScore()    : 0.5f;
         float c = colourAnalyzers.count(face.id) ? colourAnalyzers[face.id].getScore() : 0.5f;
 
-        float masterScore = (b + j + f + c) / 4.0f;
+        float masterScore = (b * weights[0] + j * weights[1] + f * weights[2] + c * weights[3]);
+        float smoothedScore = smoothedComposite * 0.85f + masterScore * 0.15f;
 
         // color the label and bbox by score: green=real, yellow: uncertain, red=fake
         ofColor statusColour = ofColor(255, 50, 50);
@@ -219,7 +223,6 @@ void ofApp::draw() {
     // Composite: blink score if active, otherwise 0.5 placeholder
     // count average for all signalScores
     // NEW: add lower weight for FFT algo
-    float weights[] = {0.45f, 0.45f, 0.10f}; // blink, jitter, FFT
     float composite = 0.0f;
     float totalWeight = 0.0f;
 
