@@ -20,9 +20,10 @@ void ofApp::setup() {
 
     // Placeholder signal scores
     signalScores = {
-        { "Blink analysis", 0.0f, false },
-        { "Landmark jitter analysis", 0.0f, false },
-        { "Algo 3",         0.0f, false },
+        { "Blink Analysis", 0.0f, false },
+        { "Landmark Jitter Analysis", 0.0f, false },
+        { "FFT Analysis",         0.0f, false },
+        { "Colour Histogram Analysis",         0.0f, false },
     };
 }
 
@@ -59,38 +60,38 @@ void ofApp::update() {
 
         // Run analysis on each detected face
         for (auto& face : tracker.getFaces()) {
-            blinkAnalyzers[face.id].update(face.landmarks);
-            jitterAnalyzers[face.id].update(face.landmarks);
+            blinkAnalyzers[face.id].update(face.landmarks, cv::Mat());
+            jitterAnalyzers[face.id].update(face.landmarks, cv::Mat());
             fftAnalyzers[face.id].update(face.cropped);
+            colourAnalyzers[face.id].update(face.landmarks, ofxCv::toCv(videoPixels));
         }
 
         // Wire scores into the sidebar – use face 0 if present
-        if (!tracker.getFaces().empty()) {
-            int id = tracker.getFaces()[0].id;
-            signalScores[0].score  = blinkAnalyzers[id].getScore();
-            signalScores[0].label  = "Blink analysis";
-            signalScores[0].active = true;
-        } else {
-            signalScores[0].label  = "Blink analysis";
-            signalScores[0].active = false;
-        }
+        const vector<string> labels = {
+            "Blink analysis", 
+            "Landmark jitter analysis", 
+            "Spatial FFT analysis", 
+            "Histogram colour analysis"
+        };
 
-        signalScores[1].label = "Landmark jitter analysis";
-        if (!tracker.getFaces().empty()) {
-            int id = tracker.getFaces()[0].id;
-            signalScores[1].score  = jitterAnalyzers[id].getScore();
-            signalScores[1].active = true;
-        } else {
-            signalScores[1].active = false;
-        }
+        bool faceFound = ! tracker.getFaces().empty();
 
-        signalScores[2].label = "Spatial FFT analysis";
-        if (!tracker.getFaces().empty()) {
-            int id = tracker.getFaces()[0].id;
-            signalScores[2].score  = fftAnalyzers[id].getScore();
-            signalScores[2].active = true;
-        } else {
-            signalScores[2].active = false;
+        for (int i = 0; i < signalScores.size(); i++) {
+            signalScores[i].label = labels[i];
+            signalScores[i].active = faceFound;
+
+            if (faceFound) {
+                int id = tracker.getFaces()[0].id;
+                
+                if (i == 0)
+                    signalScores[i].score = blinkAnalyzers[id].getScore();
+                else if (i == 1)
+                    signalScores[i].score = jitterAnalyzers[id].getScore();
+                else if (i == 2)
+                    signalScores[i].score = fftAnalyzers[id].getScore();
+                else if (i == 3)
+                    signalScores[i].score = colourAnalyzers[id].getScore();
+            }
         }
     }
 }
@@ -140,31 +141,21 @@ void ofApp::draw() {
 
     auto& faces = tracker.getFaces();
     for (auto& face : faces) {
-        float bScore = 0.5f;
-        float jScore = 0.5f;
+        float b = blinkAnalyzers.count(face.id)  ? blinkAnalyzers[face.id].getScore()  : 0.5f;
+        float j = jitterAnalyzers.count(face.id) ? jitterAnalyzers[face.id].getScore() : 0.5f;
+        float f = fftAnalyzers.count(face.id)    ? fftAnalyzers[face.id].getScore()    : 0.5f;
+        float c = colourAnalyzers.count(face.id) ? colourAnalyzers[face.id].getScore() : 0.5f;
 
-        // calculate scores
-        auto bIt = blinkAnalyzers.find(face.id);
-        if (bIt != blinkAnalyzers.end()) {
-            bScore = bIt->second.getScore();
-        }
-        
-        auto jIt = jitterAnalyzers.find(face.id);
-        if (jIt != jitterAnalyzers.end()) {
-            jScore = jIt->second.getScore();
-        }
-
-        float masterScore = (bScore + jScore) / 2.0f;
+        float masterScore = (b + j + f + c) / 4.0f;
 
         // color the label and bbox by score: green=real, yellow: uncertain, red=fake
-        
         ofColor statusColour = ofColor(255, 50, 50);
         
         if (ofGetElapsedTimef() < 4.0f) 
             statusColour = ofColor(255, 255, 255);
         else if (masterScore >= 0.7f) 
             statusColour = ofColor(0, 255, 0);
-        else if (masterScore >= 0.6f)
+        else if (masterScore >= 0.45f)
             statusColour = ofColor(255, 255, 0);
 
 
@@ -207,6 +198,28 @@ void ofApp::draw() {
         //                      + " Score: " + ofToString(jScore, 2),
         //                      labelX, labelY - 10);
         // }
+
+auto cIt = colourAnalyzers.find(face.id);
+    if (cIt != colourAnalyzers.end()) {
+        
+        // Move to the face position
+        ofPushMatrix();
+        ofTranslate(drawX, drawY);
+        ofScale(sx, sy);
+
+        ofEnableBlendMode(OF_BLENDMODE_ADD); // Makes them look like a "hologram"
+        
+        // Draw Inner Mask in Blue
+        ofSetColor(0, 100, 255, 180); 
+        cIt->second.innerVisual.draw(0, 0);
+
+        // Draw Outer Ring in Green
+        ofSetColor(0, 255, 100, 180);
+        cIt->second.outerVisual.draw(0, 0);
+
+        ofDisableBlendMode();
+        ofPopMatrix();
+    }
     }
 
     // ── 3. Video-area HUD ─────────────────────────────────────────────
@@ -226,8 +239,6 @@ void ofApp::draw() {
 
     // ── 4. Sidebar (always on top) ────────────────────────────────────
     // Composite: blink score if active, otherwise 0.5 placeholder
-    // float composite = signalScores[0].active ? signalScores[0].score : 0.5f;
-
     // count average for all signalScores
     float sum = 0.0f;
     int activeCount = 0;

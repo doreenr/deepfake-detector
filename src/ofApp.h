@@ -6,6 +6,7 @@
 #include "BlinkAnalyzer.h"
 #include "JitterAnalyzer.h"
 #include "FFTAnalyzer.h"
+#include "ColourAnalyzer.h"
 #include <map>
 
 // ── Source mode ───────────────────────────────────────────────────────────────
@@ -43,6 +44,9 @@ private:
     
     // ── FFT spatial analysis ─────────────────────
     map<int, FFTAnalyzer> fftAnalyzers;
+
+    // ── colour histogram analysis ─────────────────────
+    map<int, ColourAnalyzer> colourAnalyzers;
 
     // ── HUD fonts ─────────────────────────────────────────────────────
     ofTrueTypeFont hudFont;

@@ -9,7 +9,7 @@ void JitterAnalyzer::reset() {
     currentVariance = 0.0f;
 }
 
-void JitterAnalyzer::update(const std::vector<glm::vec2>& landmarks) {
+void JitterAnalyzer::update(const std::vector<glm::vec2>& landmarks, const cv::Mat& frame) {
     if (landmarks.size() < 468) return;
 
     glm::vec2 currentNosePos = landmarks[4];

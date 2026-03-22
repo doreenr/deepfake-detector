@@ -11,6 +11,7 @@ void FaceTracker::setup() {
     if (mpTracker) {
         mpTracker.reset();
     }
+    faces.clear();
 
     mpTracker = make_shared<mp::FaceTracker>();
     mp::FaceTracker::FaceSettings settings;

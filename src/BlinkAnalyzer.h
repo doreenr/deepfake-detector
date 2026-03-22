@@ -10,8 +10,8 @@
 
 class BlinkAnalyzer : public Analyzer {
 public:
-    void update(const vector<glm::vec2>& landmarks);
-    void reset();
+    void update(const std::vector<glm::vec2>& landmarks, const cv::Mat& frame) override;
+    void reset() override;
 
     float getBPM() const { return bpm; }
     float getEAR() const { return currentEAR; }

@@ -10,7 +10,7 @@ class JitterAnalyzer : public Analyzer {
     std::deque<float> distanceHistory;
     glm::vec2 previousPosition;
     glm::vec2 previousVelocity = glm::vec2(0,0);
-    
+
     float currentVariance = 0.0f;
     float maxJump = 0.0f;
 
@@ -19,7 +19,7 @@ class JitterAnalyzer : public Analyzer {
     float upperThreshold = 10.0f;
 
 public:
-    void update(const std::vector<glm::vec2>& landmarks) override;
+    void update(const std::vector<glm::vec2>& landmarks, const cv::Mat& frame) override;
     void reset() override;
     void calculateScore();
     float getVariance() const { return currentVariance; }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxCv.h"
 #include <deque>
 #include <vector>
 
@@ -15,7 +16,7 @@ protected:
 
 public:
     virtual ~Analyzer() = default;
-    virtual void update(const std::vector<glm::vec2>& landmarks) = 0;
+    virtual void update(const std::vector<glm::vec2>& landmarks, const cv::Mat& frame) = 0;
     virtual void reset() = 0;
 
     float getScore() const { return score; }

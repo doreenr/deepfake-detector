@@ -36,7 +36,7 @@ float BlinkAnalyzer::computeEAR(const vector<glm::vec2>& lm, bool left) {
     return (v1 + v2) / (2.0f * h);
 }
 
-void BlinkAnalyzer::update(const vector<glm::vec2>& landmarks) {
+void BlinkAnalyzer::update(const vector<glm::vec2>& landmarks, const cv::Mat& frame) {
     if (landmarks.size() < 468) return;
 
     float leftEAR  = computeEAR(landmarks, true);
