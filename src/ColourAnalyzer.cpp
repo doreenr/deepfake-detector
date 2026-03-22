@@ -76,33 +76,11 @@ void ColourAnalyzer::update(const std::vector<glm::vec2>& landmarks, const cv::M
     currentBhattacharyyaDist = cv::compareHist(histInner, histOuter, cv::HISTCMP_BHATTACHARYYA);
 
     calculateScore();
-
-    // ------------------ TEST ----------------
-ofxCv::toOf(innerMask, innerVisual);
-ofxCv::toOf(outerMask, outerVisual);
-
-innerVisual.update();
-outerVisual.update();
-
-cv::Scalar meanInner, stdDevInner;
-cv::Scalar meanOuter, stdDevOuter;
-
-cv::meanStdDev(ycrcbFrame, meanInner, stdDevInner, innerMask);
-cv::meanStdDev(ycrcbFrame, meanOuter, stdDevOuter, outerMask);
-
-
-std::cout << "--- COLOR COMPARISON DATA ---" << std::endl;
-std::cout << "FACE (Inner): Cr=" << meanInner[1] << " Cb=" << meanInner[2] << std::endl;
-std::cout << "SKIN (Outer): Cr=" << meanOuter[1] << " Cb=" << meanOuter[2] << std::endl;
-std::cout << "DIFF: Cr=" << abs(meanInner[1] - meanOuter[1]) 
-          << " Cb=" << abs(meanInner[2] - meanOuter[2]) << std::endl;
-std::cout << "-----------------------------" << std::endl;
 }
 
 void ColourAnalyzer::calculateScore() {
     if (ofGetElapsedTimef() < 4.0f) { score = 0.5f; return; }
 
-    // TEST
     std::cout << "Bhattacharyya Dist: " << currentBhattacharyyaDist << std::endl;
 
     float thresSafe = 0.92f;
