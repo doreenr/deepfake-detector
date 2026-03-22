@@ -75,7 +75,7 @@ void JitterAnalyzer::calculateScore() {
         varScore = 0.1f; // too smoothed (AI temporal smoothing)
     } else if (currentVariance < 0.0001f) { // suspiciously still
         varScore = ofMap(currentVariance, 0.00008f, 0.0001f, 0.1f, 0.5f, true);
-    } else if (currentVariance > 0.02f) { // flickering (AI noise)
+    } else if (currentVariance > 0.05f) { // flickering (AI noise)
         varScore = 0.2f;
     } else if (currentVariance > 0.01f) { // suspiciously erratic
         varScore = ofMap(currentVariance, 0.01f, 0.02f, 0.1f, 0.5f, true);
