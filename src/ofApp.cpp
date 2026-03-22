@@ -240,17 +240,21 @@ auto cIt = colourAnalyzers.find(face.id);
     // ── 4. Sidebar (always on top) ────────────────────────────────────
     // Composite: blink score if active, otherwise 0.5 placeholder
     // count average for all signalScores
-    float sum = 0.0f;
-    int activeCount = 0;
+    // NEW: add lower weight for FFT algo
+    float weights[] = {0.45f, 0.45f, 0.10f}; // blink, jitter, FFT
+    float composite = 0.0f;
+    float totalWeight = 0.0f;
 
-    for (const auto& signal : signalScores) {
-        if (signal.active) {
-            sum += signal.score;
-            activeCount++;
+    for (int i = 0; i < (int)signalScores.size(); i++) {
+        if (signalScores[i].active) {
+            composite += signalScores[i].score * weights[i];
+            totalWeight += weights[i];
         }
     }
-    float composite = (activeCount > 0) ? (sum / activeCount) : 0.5f;
-    gui.draw(signalScores, composite);
+    // added smoothing
+    composite = (totalWeight > 0.0f) ? (composite / totalWeight) : 0.5f;
+    smoothedComposite = smoothedComposite * 0.85f + composite * 0.15f;
+    gui.draw(signalScores, smoothedComposite);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -54,6 +54,7 @@ private:
 
     // ── signal scores fed into the sidebar ────────────────────────────
     vector<SignalScore> signalScores;
+    float smoothedComposite = 0.5f;
 
     // ── helpers ───────────────────────────────────────────────────────
     void resetTracker();

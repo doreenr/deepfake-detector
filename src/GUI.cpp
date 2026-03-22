@@ -236,7 +236,8 @@ GUIButton GUI::hitTest(float x, float y) const {
 
 // ─────────────────────────────────────────────────────────────────────────────
 AuthenticityLevel GUI::scoreToLevel(float score) const {
-    if (score >= 0.7f) return AuthenticityLevel::AUTHENTIC;
+    if (ofGetElapsedTimef() < 4.0f) return AuthenticityLevel::UNCERTAIN;
+    if (score >= 0.65f) return AuthenticityLevel::AUTHENTIC;
     if (score >= 0.45f || ofGetElapsedTimef() < 4.0f) return AuthenticityLevel::UNCERTAIN;
     return AuthenticityLevel::FAKE;
 }
