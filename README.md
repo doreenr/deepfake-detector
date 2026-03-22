@@ -28,7 +28,7 @@ Real head movement produces natural, irregular micro-motion. Deepfakes can appea
 **What it measures:** Frame-to-frame acceleration of the nose tip landmark (point 4), normalized by interocular distance (IOD) to be scale-independent, over a 30-frame rolling window.
 
 **Scoring:**
-- Very low variance (< 0.0001) → frozen / AI temporal smoothing, lower score
+- Very low variance (< 0.00001) → frozen / AI temporal smoothing, lower score
 - Very high variance (> 0.02) → flickering artifact, lower score
 - Large single jump (> 0.5 normalized) → teleport artifact, lower score
 - Weighted 60% variance, 40% max jump

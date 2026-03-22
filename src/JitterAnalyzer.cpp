@@ -73,7 +73,7 @@ void JitterAnalyzer::calculateScore() {
     float varScore = 1.0f;
     if (currentVariance < 0.00008f) {
         varScore = 0.1f; // too smoothed (AI temporal smoothing)
-    } else if (currentVariance < 0.0001f) { // suspiciously still
+    } else if (currentVariance < 0.00001f) { // suspiciously still
         varScore = ofMap(currentVariance, 0.00008f, 0.0001f, 0.1f, 0.5f, true);
     } else if (currentVariance > 0.05f) { // flickering (AI noise)
         varScore = 0.2f;
@@ -87,7 +87,7 @@ void JitterAnalyzer::calculateScore() {
         jumpScore = 0.1f; // big teleport (>50% of face width shift in 1 frame)
     } else if (maxJump > 0.1f) {
         jumpScore = 0.4f; // sharp change
-    } else if (maxJump < 0.01f) {
+    } else if (maxJump < 0.001f) {
         jumpScore = 0.2f; // frozen image
     }
 
