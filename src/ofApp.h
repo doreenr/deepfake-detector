@@ -7,6 +7,7 @@
 #include "JitterAnalyzer.h"
 #include "FFTAnalyzer.h"
 #include "ColourAnalyzer.h"
+#include "EdgeAnalyzer.h"
 #include <map>
 
 // ── Source mode ───────────────────────────────────────────────────────────────
@@ -47,6 +48,9 @@ private:
 
     // ── colour histogram analysis ─────────────────────
     map<int, ColourAnalyzer> colourAnalyzers;
+
+    // ── edge (Canny) analysis ─────────────────────
+    map<int, EdgeAnalyzer> edgeAnalyzers;
 
     // ── HUD fonts ─────────────────────────────────────────────────────
     ofTrueTypeFont hudFont;

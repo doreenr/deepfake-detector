@@ -24,6 +24,7 @@ void ofApp::setup() {
         { "Landmark Jitter Analysis", 0.0f, false },
         { "FFT Analysis",         0.0f, false },
         { "Colour Histogram Analysis",         0.0f, false },
+        { "Edge (Canny) Analysis",  0.0f, false },
     };
 }
 
@@ -64,14 +65,16 @@ void ofApp::update() {
             jitterAnalyzers[face.id].update(face.landmarks, cv::Mat());
             fftAnalyzers[face.id].update(face.cropped);
             colourAnalyzers[face.id].update(face.landmarks, ofxCv::toCv(videoPixels));
+            edgeAnalyzers[face.id].update(face.landmarks, ofxCv::toCv(videoPixels));
         }
 
         // Wire scores into the sidebar – use face 0 if present
         const vector<string> labels = {
-            "Blink analysis", 
-            "Landmark jitter analysis", 
-            "Spatial FFT analysis", 
-            "Histogram colour analysis"
+            "Blink analysis",
+            "Landmark jitter analysis",
+            "Spatial FFT analysis",
+            "Histogram colour analysis",
+            "Edge (Canny) analysis"
         };
 
         bool faceFound = ! tracker.getFaces().empty();
@@ -91,6 +94,8 @@ void ofApp::update() {
                     signalScores[i].score = fftAnalyzers[id].getScore();
                 else if (i == 3)
                     signalScores[i].score = colourAnalyzers[id].getScore();
+                else if (i == 4)
+                    signalScores[i].score = edgeAnalyzers[id].getScore();
             }
         }
     }
@@ -118,7 +123,7 @@ void ofApp::draw() {
     float areaW = ofGetWidth()  - sbW;
     float areaH = ofGetHeight();
 
-    float weights[] = {0.3f, 0.3f, 0.1f, 0.3f}; // blink, jitter, FFT, histogram
+    float weights[] = {0.25f, 0.25f, 0.1f, 0.25f, 0.15f}; // blink, jitter, FFT, histogram, edge
 
 
     // ── 1. Letterboxed video feed ─────────────────────────────────────
@@ -148,8 +153,9 @@ void ofApp::draw() {
         float j = jitterAnalyzers.count(face.id) ? jitterAnalyzers[face.id].getScore() : 0.5f;
         float f = fftAnalyzers.count(face.id)    ? fftAnalyzers[face.id].getScore()    : 0.5f;
         float c = colourAnalyzers.count(face.id) ? colourAnalyzers[face.id].getScore() : 0.5f;
+        float e = edgeAnalyzers.count(face.id)   ? edgeAnalyzers[face.id].getScore()   : 0.5f;
 
-        float masterScore = (b * weights[0] + j * weights[1] + f * weights[2] + c * weights[3]);
+        float masterScore = (b * weights[0] + j * weights[1] + f * weights[2] + c * weights[3] + e * weights[4]);
         float smoothedScore = smoothedComposite * 0.85f + masterScore * 0.15f;
 
         // color the label and bbox by score: green=real, yellow: uncertain, red=fake
@@ -314,6 +320,7 @@ void ofApp::resetTracker() {
     blinkAnalyzers.clear();
     jitterAnalyzers.clear();
     fftAnalyzers.clear();
+    edgeAnalyzers.clear();
     setup();
 }
 
